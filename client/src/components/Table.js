@@ -1,14 +1,32 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTable, useSortBy, useGlobalFilter } from 'react-table';
-import MOCK_DATA from './MOCK_DATA.json';
+// import MOCK_DATA from './MOCK_DATA.json';
 import { COLUMNS } from './columns';
 import Filter from './Filter'
+import axios from 'axios';
 import './table.css'
 
 export const Table = () => {
 
+    const [loadingData, setLoadingData] = useState(true);
+
     const columns = useMemo(() => COLUMNS, []);
-    const data = useMemo(() => MOCK_DATA, []);
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        async function getData() {
+            await axios
+                .get("http://localhost:5000/api/items")
+                .then((res => {
+                    console.log(res.data);
+                    setData(res.data);
+                    setLoadingData(false);
+                }));
+        }
+        if(loadingData) {
+            getData();
+        }
+    }, []);
 
     const tableExample = useTable({
             columns,
